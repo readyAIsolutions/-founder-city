@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Founder City — Live Game</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+body{padding-bottom:60px}
+.topbar{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);margin-bottom:22px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:20px;letter-spacing:.5px}
+.brand span{color:var(--gold)}
+.nav{display:flex;gap:8px;margin-left:auto}
+.nav button{background:transparent;border:1px solid var(--line);color:var(--dim);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+.nav button.active{background:var(--panel2);color:var(--gold);border-color:var(--gold)}
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.dash .card h3{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.dash .card .v{font-size:24px;font-weight:800;margin-top:6px}
+.gold{color:var(--gold)}.green{color:var(--green)}.red{color:var(--red)}.cyan{color:var(--cyan)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,select,button.imp{background:#0d1420;border:1px solid var(--line);color:var(--txt);padding:11px 14px;border-radius:8px;font-size:14px}
+input:focus,select:focus{outline:none;border-color:var(--gold)}
+button.imp{background:linear-gradient(90deg,var(--gold),var(--gold2));color:#111;font-weight:700;cursor:pointer;border:none}
+button.sec{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:10px 14px;border-radius:8px;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.biz{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.biz .card{cursor:pointer;border:1px solid var(--line);transition:.15s}
+.biz .card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.biz .cost{color:var(--gold);font-weight:700;margin-top:6px}
+.chat{background:#0a0f16;border:1px solid var(--line);border-radius:10px;padding:14px;height:240px;overflow-y:auto;margin-bottom:12px}
+.msg{margin:6px 0;padding:8px 12px;border-radius:8px;font-size:14px;max-width:88%}
+.msg.opp{background:#1b2337;color:var(--txt)}
+.msg.you{background:#122a1f;color:var(--txt);margin-left:auto}
+.msg.sys{background:#241c0e;color:var(--gold);width:100%;text-align:center}
+.hide{display:none}
+.kpi{display:flex;gap:8px;flex-wrap:wrap}
+.kpi .k{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;text-align:center}
+.kpi .k .n{font-size:20px;font-weight:800}
+.kpi .k .l{font-size:11px;color:var(--dim)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.dash,.two{grid-template-columns:1fr}.nav{margin-left:0;width:100%;flex-wrap:wrap}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1b2337;border:1px solid var(--red);color:var(--txt);padding:12px 20px;border-radius:10px;font-size:14px;z-index:99;max-width:80%;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+</style>
+</head><body>
+<div class="wrap">
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="panel" style="max-width:640px;margin:6vh auto;text-align:center">
+      <h1 style="font-size:40px;font-weight:800;letter-spacing:-1px">Founder City</h1>
+      <p style="color:var(--dim);margin:10px 0 22px">You're handed <b class="gold">$5,000</b>, a small apartment, a smartphone and an AI business mentor. Where do you plant your empire?</p>
+      <div class="row" style="justify-content:center">
+        <button class="imp" id="useLoc">📍 Start where I am</button>
+      </div>
+      <p style="color:var(--dim);font-size:12px;margin:16px 0">or find your real city anywhere in the USA</p>
+      <div class="row" style="justify-content:center;flex-wrap:wrap">
+        <input id="startSearch" placeholder="Search any US city… (e.g. 'Twin Falls, ID')" style="width:260px">
+        <button class="sec" id="startSearchBtn">Search</button>
+      </div>
+      <div id="startResults" style="margin:10px auto 0;max-width:480px"></div>
+      <p style="color:var(--dim);font-size:12px;margin:14px 0">…or pick a featured city</p>
+      <div class="row" style="justify-content:center">
+        <input id="handle" placeholder="Your founder handle" style="width:200px">
+        <select id="citySel" style="max-width:220px"></select>
+      </div>
+      <p id="locNote" style="color:var(--cyan);font-size:13px;margin:12px 0;min-height:18px"></p>
+      <div class="row" style="justify-content:center;margin-top:8px">
+        <input id="authUser" placeholder="username" style="width:150px" autocomplete="username">
+        <input id="authPw" type="password" placeholder="password (6+ chars)" style="width:170px" autocomplete="current-password">
+        <select id="authMode" style="width:150px">
+          <option value="create">Create account</option>
+          <option value="login">I have an account — log in</option>
+        </select>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:10px">
+        <button class="imp" id="startBtn">Start your empire →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="hide">
+    <div class="topbar">
+      <div class="brand">Founder City <span style="font-size:12px;color:var(--dim)">· <span id="gHandle"></span> <span id="gCity" class="gold"></span> · Level <span id="gLevel">1</span> <a href="javascript:void 0" onclick="logout()" style="color:var(--dim);font-size:11px;text-decoration:none;border:1px solid var(--line);padding:2px 7px;border-radius:6px;margin-left:6px">Log out</a></span></div>
+      <div class="nav">
+        <button data-t="dash" class="active">Home</button>
+        <button data-t="biz">Business</button>
+        <button data-t="move">Relocate</button>
+        <button data-t="neg">Negotiate</button>
+        <button data-t="pp">Passport</button>
+        <button data-t="learn">Learn</button>
+        <button data-t="money">Money</button>
+        <button data-t="work">Work</button>
+        <button data-t="market">Market</button>
+        <button data-t="coaches">Coaches</button>
+        <button data-t="connect">Connect</button>
+        <button data-t="nation">Nation</button>
+        <button data-t="network">Network</button>
+        <button data-t="missions">Missions</button>
+        <button data-t="economy">Economy</button>
+        <button data-t="events">Events</button>
+        <button data-t="district">District</button>
+      </div>
+    </div>
+
+    <div class="dash">
+      <div class="card"><h3>Cash on hand</h3><div class="v gold" id="dCash"></div></div>
+      <div class="card"><h3>Net worth</h3><div class="v" id="dNet"></div></div>
+      <div class="card"><h3>Business</h3><div class="v" id="dBiz" style="font-size:17px"></div></div>
+      <div class="card"><h3>Month</h3><div class="v cyan" id="dMonth"></div></div>
+    </div>
+
+    <!-- HOME -->
+    <div class="view" id="view-dash">
+      <div class="panel">
+        <h3>Your city</h3><p style="color:var(--dim)" id="cityInfo"></p>
+        <div class="row" style="margin-top:12px"><button class="sec" data-t="biz">Plan my business</button><button class="sec" data-t="move">Scout new territory</button><button class="sec" data-t="neg">Enter the deal room</button></div>
+      </div>
+      <div class="panel">
+        <h3>AI coach</h3>
+        <div id="coachQuick" style="color:var(--dim)">Your mentor will review your performance after every negotiation. Ask hard questions during due diligence — that's where the real skill is tested.</div>
+        <div class="kpi" id="skillKpi" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="view hide" id="view-biz">
+      <div id="bizPick" class="panel">
+        <h3>Choose a starter business</h3>
+        <div class="biz" id="bizList"></div>
+      </div>
+      <div class="panel" id="bizProducers" style="display:none">
+        <h3>🏭 Start a producer business (sell to other players)</h3>
+        <p style="color:var(--dim);font-size:13px">Produce a real commodity and post it on the <b>player supply market</b> — other players pay you for it. You consume inputs, so watch commodity prices.</p>
+        <div class="biz" id="prodList"></div>
+      </div>
+      <div id="bizRun" class="hide panel">
+        <div class="two">
+          <div>
+            <h3 id="runTitle"></h3><p style="color:var(--dim)" id="runBlurb"></p>
+            <div class="row" style="margin-top:12px"><button class="imp" id="runMonth">Run a month →</button><span id="lastCycle" style="color:var(--dim);font-size:12px"></span></div>
+          </div>
+          <div><h3 style="color:var(--dim);font-size:13px">Last month</h3><div id="monthReport" style="margin-top:8px"></div></div>
+        </div>
+        <div id="burnNote" class="red hide" style="margin-top:12px">⚠ Cash is running low — cut costs, win customers, or move to cheaper territory.</div>
+      </div>
+    </div>
+
+    <!-- RELOCATE -->
+    <div class="view hide" id="view-move">
+      <div class="panel">
+        <h3>Relocate your business</h3>
+        <p style="color:var(--dim);font-size:14px">Your <b class="gold">capital</b> pays for the move — this is the "from your $5,000 you up and move" rule. Local moves are cheap; cross-country burns real cash. High cost-of-living cities cost more to enter.</p>
+        <div class="row" style="margin-top:14px">
+          <select id="moveSel" style="max-width:280px"></select>
+          <button class="imp" id="moveBtn">Show cost</button>
+        </div>
+        <div id="moveQuote" style="margin-top:14px"></div>
+      </div>
+      <div class="panel"><h3 style="color:var(--dim);font-size:12px">City intel</h3><div id="cityIntel" style="margin-top:8px;color:var(--dim)"></div></div>
+    </div>
+
+    <!-- NEGOTIATE -->
+    <div class="view hide" id="view-neg">
+      <div class="panel">
+        <h3>AI negotiation engine</h3>
+        <p style="color:var(--dim);font-size:14px">Walk into a boardroom with a real counterpart who has emotional reactions, tactics and <b>hidden risks</b>. Ask questions, make offers — then get coached.</p>
+        <div class="row" style="margin-top:12px">
+          <button class="imp" id="negStart">Open a deal</button>
+          <span id="negDeal" class="gold" style="font-size:13px"></span>
+        </div>
+      </div>
+      <div id="negRoom" class="hide panel">
+        <div class="two">
+          <div>
+            <div id="negChat" class="chat"></div>
+            <div class="row" id="negAsk"></div>
+            <div class="row" id="negOffer" style="margin-top:12px">
+              <input type="number" id="negAmount" placeholder="Your offer ($)" style="width:140px">
+              <button class="imp" id="negOfferBtn">Make offer</button>
+              <button class="sec" id="negCounterBtn" class="hide">Accept their counter</button>
+              <button class="sec" id="negCloseBtn">End deal → review</button>
+            </div>
+          </div>
+          <div>
+            <h3 style="color:var(--dim);font-size:12px">Coach evaluation</h3>
+            <div id="negReview" style="color:var(--dim);font-size:14px">Complete a deal to see your AI coach's breakdown of your negotiation and due-diligence performance.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSPORT -->
+    <div class="view hide" id="view-pp">
+      <div class="panel">
+        <div class="two">
+          <div><h3>Empire Passport</h3><p id="ppHandle" style="color:var(--gold);font-weight:700"></p><p id="ppIndustry" style="color:var(--dim)"></p><p id="ppRep" style="margin-top:6px"></p></div>
+          <div><h3 style="color:var(--dim);font-size:12px">Demonstrated skills</h3><div class="kpi" id="ppSkills"></div></div>
+        </div>
+      </div>
+      <div class="panel"><h3>Business network</h3><div id="ppNet" style="color:var(--dim)"></div></div>
+    </div>
+
+    <!-- LEARN -->
+    <div class="view hide" id="view-learn">
+      <div class="panel">
+        <h3>Learning Lab</h3>
+        <p style="color:var(--dim);font-size:14px">Listen on <b class="gold">Audible</b> (or read) — log your minutes here. <b class="cyan">Minutes earn XP + skill</b>. Finishing a book pays a <b class="green">one-time earned-money bonus</b> and a certification on your passport.</p>
+        <div class="biz" id="bookList"></div>
+      </div>
+      <div class="panel">
+        <h3>Speak Like a Salesman &amp; CEO</h3>
+        <p style="color:var(--dim);font-size:14px">Spoken-curriculum classes on sales scripts, boardroom &amp; investor language, negotiation psychology and pitching. Complete the real exercise, pass, and earn earned-money + a certified skill.</p>
+        <div class="biz" id="classList"></div>
+      </div>
+    </div>
+
+    <!-- MONEY -->
+    <div class="view hide" id="view-money">
+      <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat"><div class="n gold" id="mWallet"></div><div class="l">Earned (cashout)</div></div>
+        <div class="stat"><div class="n" id="mXp"></div><div class="l">Experience XP</div></div>
+        <div class="stat"><div class="n" id="mLevel"></div><div class="l">Level</div></div>
+        <div class="stat"><div class="n" id="mDeals"></div><div class="l">Deals</div></div>
+      </div>
+      <div class="panel">
+        <h3>Share a real business you built → earn money &amp; XP</h3>
+        <p style="color:var(--dim);font-size:13px">Created real software, a store, a service, a brand? Put it in the game. A sponsor verifies your live link and you earn <b class="gold">+$3,000</b> to your wallet and <b class="cyan">+2,500 XP</b>.</p>
+        <div class="row"><input id="attTitle" placeholder="Project / business title" style="min-width:180px"><input id="attUrl" placeholder="https://... live link" style="min-width:220px"><button class="imp" id="attBtn">Submit for verification</button></div>
+        <div id="attList" style="margin-top:10px;color:var(--dim)"></div>
+      </div>
+      <div class="panel">
+        <h3>Cash out — Stripe / PayPal</h3>
+        <p style="color:var(--dim);font-size:13px" id="payStatus"></p>
+        <div class="row">
+          <select id="payProcessor"><option>stripe</option><option>paypal</option></select>
+          <input id="payAcct" placeholder="Stripe connected-account id / PayPal email">
+          <button class="sec" id="payConnectBtn">Connect account</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="payAmt" placeholder="Amount ($)" style="width:110px">
+          <button class="imp" id="payReqBtn">Request payout</button>
+          <span id="payNote" style="color:var(--red);font-size:12px"></span>
+        </div>
+        <div id="payoutLedger" style="margin-top:10px;color:var(--dim)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- WORK -->
+    <div class="view hide" id="view-work">
+      <div class="panel"><h3>Your NPC relationships</h3><div id="ncRel" style="color:var(--dim)"></div></div>
+      <div class="panel">
+        <h3>Freelance contracts — sell your services to AI companies</h3>
+        <p style="color:var(--dim);font-size:13px">Real work demand from living NPC companies. Take a contract, deliver, get paid + XP + trust. High trust lets you own their rights later.</p>
+        <div class="biz" id="workList"></div>
+      </div>
+    </div>
+
+    <!-- MARKET -->
+    <div class="view hide" id="view-market">
+      <div class="panel"><h3>Your business rights</h3><div id="ownedList" style="color:var(--dim)"></div></div>
+      <div class="panel">
+        <h3>Real-business rights marketplace</h3>
+        <p style="color:var(--dim);font-size:13px">Real &amp; virtual businesses listed for sale — buy the rights with your <b class="gold">earned wallet</b>. In-game equity + dividends now; real settlement via Stripe/PayPal when live.</p>
+        <div class="biz" id="marketList"></div>
+      </div>
+    </div>
+
+    <!-- COACHES -->
+    <div class="view hide" id="view-coaches">
+      <div class="panel"><h3>My coaching sessions</h3><div id="myBookings" style="color:var(--dim)"></div></div>
+      <div class="panel">
+        <h3>Hire a real expert coach</h3>
+        <p style="color:var(--dim);font-size:13px">Real professionals coach you live on Google Meet/Zoom. Pay with your earned wallet (settles via Stripe/PayPal when configured).</p>
+        <div class="biz" id="coachList"></div>
+      </div>
+    </div>
+
+    <!-- CONNECT -->
+    <div class="view hide" id="view-connect">
+      <div class="panel">
+        <h3>AI Business Mentor</h3>
+        <p style="color:var(--dim);font-size:13px" id="mentorNote"></p>
+        <div class="row"><input id="mentorQ" placeholder="Ask about sales, negotiation, leadership, investing…" style="flex:1"><button class="imp" id="mentorBtn">Ask</button></div>
+        <div id="mentorOut" style="margin-top:10px;padding:12px;background:#0a0f16;border:1px solid var(--line);border-radius:10px;color:var(--txt);min-height:44px;font-size:14px">Your mentor is listening.</div>
+      </div>
+      <div class="panel">
+        <h3>Meridge reality — Google Meet / Zoom / Slack</h3>
+        <p style="color:var(--dim);font-size:13px">Connect your real business tools. Log a real meeting and the recording/notes fold into your NPC mentor's knowledge — every real connection earns XP.</p>
+        <div class="row">
+          <select id="meetPlatform"><option>Google Meet</option><option>Zoom</option><option>Slack</option><option>Phone</option></select>
+          <input id="meetLink" placeholder="Meet/Zoom link · Slack channel · phone" style="flex:1">
+          <button class="sec" id="meetSaveBtn">Connect</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="mtTitle" placeholder="Who did you meet? (real person)" style="flex:1">
+          <input id="mtPeople" type="number" placeholder="people" style="width:80px">
+          <button class="imp" id="meetLogBtn">Log real meeting</button>
+        </div>
+        <div id="meetingsList" style="margin-top:12px;color:var(--dim)"></div>
+      </div>
+    </div>
+
+    <!-- NATION -->
+    <div class="view hide" id="view-nation">
+      <div class="panel">
+        <h3>Explore any US city — the map</h3>
+        <div class="row"><input id="nSearch" placeholder="Search any US city, e.g. 'Pittsburgh, PA' or 'Kodiak, AK'" style="flex:1"><button class="sec" id="nSearchBtn">Go</button></div>
+        <div id="nResults" style="margin-top:8px"></div>
+      </div>
+      <div class="panel"><div id="cityBooth"></div></div>
+      <div class="panel">
+        <h3>Business people &amp; corporations</h3>
+        <p style="color:var(--dim);font-size:13px">NPC executives who think and respond like real businesspeople. <b>Talk to them by typing</b> below. (Voice &amp; voice-to-text are planned for a future release — everything is typed for now.)</p>
+        <div class="biz" id="charList"></div>
+      </div>
+      <div class="panel">
+        <h3>Link your real professional life</h3>
+        <div class="row"><input id="liUrl" placeholder="https://linkedin.com/in/you" style="flex:1"><button class="imp" id="liBtn">Link LinkedIn (+800 XP)</button></div>
+      </div>
+    </div>
+
+    <!-- NETWORK -->
+    <div class="view hide" id="view-network">
+      <div class="panel"><h3>You</h3><p style="color:var(--dim)" id="netSelf"></p></div>
+      <div class="panel">
+        <h3>Connections near your level</h3>
+        <p style="color:var(--dim);font-size:13px">The XP-band system matches you with players within ~15% of your experience. Meet peers, message them, build real partnerships.</p>
+        <div id="matchList" style="margin-top:8px"></div>
+      </div>
+      <div class="panel">
+        <h3>Message a matched player</h3>
+        <div class="row">
+          <select id="msgWho" style="max-width:200px"></select>
+          <input id="msgText" placeholder="Your message…" style="flex:1">
+          <button class="imp" id="msgBtn">Send</button>
+        </div>
+      </div>
+      <div class="panel"><h3>Discover — search by city, industry, interest</h3>
+        <div class="row"><input id="discQ" placeholder="name, city, industry, or interest…" style="flex:1"><input id="discCity" placeholder="city?" style="width:110px"><button class="sec" id="discBtn">Search</button></div>
+        <div id="discList" style="margin-top:8px;color:var(--dim)"></div>
+      </div>
+      <div class="panel"><h3>Inbox</h3><div id="inboxList" style="color:var(--dim)"></div></div>
+    </div>
+
+    <!-- MISSIONS -->
+    <div class="view hide" id="view-missions">
+      <div class="panel">
+        <h3>Real World Missions — the bridge between learning and doing</h3>
+        <p style="color:var(--dim);font-size:13px">Do real things outside the game — a real business plan, real customer interviews, a real pitch, a real course, a real prototype, real teamwork. Submit evidence for <b class="cyan">participation XP</b> now; a <b>verifier confirms it</b> and you bank the big XP + money + reputation. Your virtual empire levels up when your real life does.</p>
+        <div class="biz" id="missionBoard"></div>
+      </div>
+      <div class="panel"><h3>My mission log</h3><div id="missionLog" style="color:var(--dim)"></div></div>
+    </div>
+
+    <!-- ECONOMY -->
+    <div class="view hide" id="view-economy">
+      <div class="panel"><h3>Live commodity &amp; supply markets</h3><div id="econPrices" style="color:var(--dim)"></div></div>
+      <div class="panel"><h3>How the economy connects</h3><div id="econChain" style="color:var(--dim)"></div></div>
+      <div class="panel"><h3>Your business — input exposure</h3><div id="econExposure" style="color:var(--dim)"></div></div>
+      <div class="panel"><h3>Sign a supply contract</h3><div id="econOffers" style="color:var(--dim)"></div></div>
+      <div class="panel"><h3>Player supply market — buy from real players</h3>
+        <p style="color:var(--dim);font-size:13px">Producers (players running a Farm, Lumber Mill, Steel Mill, Tech Maker, Textile Mill) post surplus here. Buy their output and the money goes <b>to that player</b>; your input gets locked ~7% cheaper. Start a producer business in the <b>Business</b> tab to sell your own.</p>
+        <div id="econSupply" style="color:var(--dim)"></div>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="view hide" id="view-events">
+      <div class="panel"><h3>🏆 Live events &amp; competitions</h3>
+        <p style="color:var(--dim);font-size:13px">Weekly tournaments + monthly challenges. Outcomes are seeded by your actual skills — winning is earned, not RNG. Higher skills, better placements.</p>
+        <div class="biz" id="eventList"></div>
+      </div>
+      <div class="panel"><h3>My event history</h3><div id="eventHistory" style="color:var(--dim)"></div></div>
+    </div>
+
+    <!-- DISTRICT -->
+    <div class="view hide" id="view-district">
+      <div class="panel">
+        <h3>🏙️ Your business district — <span id="districtCity"></span></h3>
+        <p style="color:var(--dim);font-size:13px">A stylized 3D street for the district your business calls home. <b>Walk</b> with <kbd>W A S D</kbd>/arrows, <b>click a building</b> to enter it. Your HQ and the places that matter are all on this block.</p>
+        <canvas id="districtCanvas" width="980" height="540" style="width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#0d1420"></canvas>
+        <div id="districtPanel" style="margin-top:10px;padding:12px;background:#0a0f16;border:1px solid var(--line);border-radius:10px;min-height:54px;color:var(--dim)"></div>
+      </div>
+    </div>
+
+<script>
+let TOKEN=(localStorage.getItem('fc_token')||'').trim();
+function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+const $=id=>document.getElementById(id);
+let P=null, META=null, NEG=null;
+async function api(path,opts={}){
+  const hdrs={'Content-Type':'application/json'};
+  if(TOKEN){hdrs['Authorization']='Bearer '+TOKEN;}
+  opts={...opts,headers:{...hdrs,...(opts.headers||{})}};
+  const r=await fetch('/api'+path,opts);
+  const j=await r.json().catch(()=>({detail:r.statusText}));
+  if(!r.ok)throw new Error(j.detail||'Request failed');
+  return j;
+}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),5000);}
+function money(n){return '$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:0});}
+function hash(){
+  $('dCash').textContent=money(P.cash);
+  $('dNet').textContent=money(P.net_worth);
+  $('dBiz').textContent=P.business_label||'—';
+  $('dMonth').textContent='M'+P.month_global;
+  $('gLevel').textContent=P.level; $('gCity').textContent=P.city;
+  const L={1:'The Hustler',2:'The Deal Maker',3:'The Investor',4:'The Mogul'};
+  $('coachQuick').textContent=`Level ${P.level} — ${L[P.level]}. Keep executing: run the numbers, negotiate smart, expand when cash allows.`;
+}
+function navigate(t){
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hide'));
+  $('view-'+t).classList.remove('hide');
+  if(t==='pp')renderPassport();
+  if(t==='learn')renderLearn();
+  if(t==='money')renderMoney();
+  if(t==='work')renderWork();
+  if(t==='market')renderMarket();
+  if(t==='coaches')renderCoaches();
+  if(t==='connect')renderConnect();
+  if(t==='nation')renderNation();
+  if(t==='network')renderNetwork();
+  if(t==='missions')renderMissions();
+  if(t==='economy')renderEconomy();
+  if(t==='events')renderEvents();
+  if(t==='district')initDistrict();
+  if(t==='dash')loadCoach();
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.t)));
+document.querySelectorAll('.view [data-t]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.t)));
+
+// ---------- init
+(async function init(){
+  META=await api('/meta');
+  $('citySel').innerHTML=META.cities.map(c=>`<option>${c.name}, ${c.state}</option>`).join('');
+  $('moveSel').innerHTML=META.cities.map(c=>`<option value="${c.name}">${c.name}, ${c.state} — COL ${c.col} · Biz ${c.biz}</option>`).join('');
+  const mov=api=>new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000}));
+  $('useLoc').onclick=async()=>{
+    try{const pos=await mov();const q=await api('/nation/nearest?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude);
+      $('locNote').textContent='Mapped to your location → '+q.city+', '+(q.state||'').toUpperCase();
+      $('handle').value=''; window._auto={city:q.city,state:q.state,lat:q.lat,lon:q.lon}; window._here=1;}
+    catch(e){$('locNote').textContent='Could not read location (denied/offline) — pick a city below instead.';}
+  };
+  $('startBtn').onclick=async()=>{
+    const handle=$('handle').value.trim()||window._auto?.handle||'founder-'+Math.floor(Math.random()*999);
+    let city=window._auto?.city;
+    if(!city){const v=$('citySel').value;city=v.split(',')[0].trim();}
+    let body={handle,city};
+    if(window._here&&window._auto){body={handle,lat:1,lon:1};}
+    try{
+      if(window._auto&&window._here){body={handle,lat:window._auto.lat+0.001,lon:window._auto.lon+0.001};}
+      const p=await api('/players',{method:'POST',body:JSON.stringify(body)});
+      P=p; $('gHandle').textContent=p.handle; $('startScreen').classList.add('hide'); $('gameScreen').classList.remove('hide');
+      $('cityInfo').textContent=`You start in ${p.city}, ${p.state.toUpperCase()} — a living market with cost-of-living index ${p.city&&META.cities.find(c=>c.name===p.city)?.col||''} and business opportunity ${p.city&&META.cities.find(c=>c.name===p.city)?.biz||''}/100. Your local demand gives your business momentum.`;
+      // try to match a coordinate-based auto location city
+      if(window._auto){P=p; hash(); renderBiz(); renderMove(); }
+      else {P=p;}
+      hash(); renderBiz(); renderMove(); renderSkills();
+    }catch(e){toast(e.message);}
+  };
+  document.querySelectorAll('#bizList .card, #bizRun').length;
+  buildBizList();
+  $('runMonth').onclick=runMonth;
+  $('moveBtn').onclick=showMoveQuote;
+  $('negStart').onclick=startNeg;
+  $('negOfferBtn').onclick=()=>makeOffer();
+  $('negCounterBtn').onclick=acceptCounter;
+  $('negCloseBtn').onclick=closeNeg;
+  $('negChat').addEventListener('click',()=>{});
+})();
+
+function buildBizList(){
+  $('bizList').innerHTML=META.businesses.map(b=>
+    `<div class="card" onclick="startBiz('${b.id}')"><div style="font-weight:700">${b.name}</div><div style="color:var(--dim);font-size:12px">${b.category}</div><p style="color:var(--dim);font-size:12px;margin-top:4px">${b.blurb}</p><div class="cost">${money(b.cost)} · margin ${Math.round(b.margin*100)}%</div></div>`).join('');
+  renderProducers();
+}
+async function renderProducers(){
+  try{
+    const pr=await api('/producers');
+    $('bizProducers').style.display='block';
+    $('prodList').innerHTML=pr.producers.map(p=>
+      `<div class="card" onclick="startBiz('${p.id}')"><div style="font-weight:700">${p.name}</div>
+        <div style="color:var(--dim);font-size:12px">makes <b class="cyan">${p.output}</b> for the supply market</div>
+        <p style="color:var(--dim);font-size:12px;margin-top:4px">${p.blurb}</p>
+        <div class="cost">${money(p.setup_cost)} to set up</div></div>`).join('');
+  }catch(e){}
+}
+async function startBiz(id){
+  try{const p=await api('/players/'+P.id+'/start-business',{method:'POST',body:JSON.stringify({business_id:id})});P=p;$('bizPick').classList.add('hide');$('bizRun').classList.remove('hide');$('runTitle').textContent=p.business_label;$('runBlurb').textContent=META.businesses.find(b=>b.id===id).blurb;renderBiz();hash();toast('You are now running '+p.business_label);}
+  catch(e){toast(e.message);}
+}
+function showBizRun(){ if(P.business){$('bizPick').classList.add('hide');$('bizRun').classList.remove('hide');$('runTitle').textContent=P.business_label;$('runBlurb').textContent=META.businesses.find(b=>b.id===P.business)?.blurb||'';$('bizRun').classList.contains('hide')&&( $('bizRun').classList.remove('hide'));} }
+function renderBiz(){
+  if(P.business){$('bizPick').classList.add('hide');$('bizRun').classList.remove('hide');$('runTitle').textContent=P.business_label;$('runBlurb').textContent=META.businesses.find(b=>b.id===P.business)?.blurb||''; $('runBlurb')&&($('runBlurb').textContent=META.businesses.find(b=>b.id===P.business)?.blurb||'');
+  }else{$('bizPick').classList.remove('hide');$('bizRun').classList.add('hide');}
+}
+async function runMonth(){
+  try{
+    const r=await api('/players/'+P.id+'/run-month',{method:'POST'});
+    P=r; const m=r.month;
+    $('monthReport').innerHTML=
+     `<div class="kpi">
+        <div class="k"><div class="n gold">${money(m.revenue)}</div><div class="l">Revenue</div></div>
+        <div class="k"><div class="n red">${money(m.expenses)}</div><div class="l">Expenses</div></div>
+        <div class="k"><div class="n ${m.net>=0?'green':'red'}">${money(m.net)}</div><div class="l">Net</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--dim);margin-top:8px">Market cycle: <b class="${m.cycle_label==='boom'?'green':m.cycle_label==='slump'?'red':''}">${m.cycle_label}</b> (${m.cycle.toFixed(2)}) · rent ${money(m.rent)} · labor ${money(m.labor)}</p>`;
+    $('lastCycle').textContent='— '+m.cycle_label+' market';
+    $('burnNote').classList.toggle('hide',!m.burn_warning);
+    hash();
+  }catch(e){toast(e.message);}
+}
+function renderMove(){
+  const c=META.cities.find(x=>x.name===P.city);
+  $('cityIntel').innerHTML=`<b>${P.city}</b>, ${P.state.toUpperCase()} — cost of living ${c?.col} (nat. avg 100), business opportunity ${c?.biz}/100, metro ${c?.pop}M.</b>`;
+  // exclude current city
+  $('moveSel').innerHTML=META.cities.filter(x=>x.name!==P.city).map(c=>`<option value="${c.name}">${c.name}, ${c.state} — COL ${c.col} · Biz ${c.biz}</option>`).join('');
+}
+async function showMoveQuote(){
+  const target=$('moveSel').value;
+  try{
+    // dry-run cost via a transient player view: query relocation without moving is safest client-side
+    const a=META.cities.find(x=>x.name===P.city), b=META.cities.find(x=>x.name===target);
+    const d=dist(a.lat,a.lon,b.lat,b.lon), cost=Math.max(350,Math.round(250+d*2.2+Math.max(0,b.col-a.col)*90));
+    const afford=cost<=P.cash;
+    $('moveQuote').innerHTML=`<p style="color:var(--dim)">${P.city} → ${target}: <b class="gold">${money(cost)}</b> relocation (${Math.round(d)} mi, COL swing +${Math.max(0,b.col-a.col)}). You have ${money(P.cash)} — ${afford?'you can afford it.':'not enough yet — earn more or move local.'}</p>
+    <div class="row" style="margin-top:10px"><button class="imp" ${afford?'':'disabled'} onclick="doMove('${target}')">${afford?'Move my business →':'Insufficient capital'}</button></div>`;
+  }catch(e){toast(e.message);}
+}
+function dist(aLat,aLon,bLat,bLon){const R=3958.8,p1=aLat*Math.PI/180,p2=bLat*Math.PI/180,dp=p2-p1,dl=(bLon-aLon)*Math.PI/180,h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+async function doMove(target){
+  try{const p=await api('/players/'+P.id+'/relocate',{method:'POST',body:JSON.stringify({target})});P=p;$('moveQuote').innerHTML='';toast(`Relocated to ${p.city}, ${p.state.toUpperCase()}. ${money(p.cash)} remaining.`);hash();renderMove();buildBizList();}
+  catch(e){toast(e.message);}
+}
+// ---------- negotiate
+let qButtons=[];
+async function startNeg(){
+  if(!P.business)return toast("Start a business first — that's what you're negotiating with.");
+  try{
+    NEG=await api('/players/'+P.id+'/negotiate/start',{method:'POST',body:JSON.stringify({})});
+    $('negDeal').textContent=' — '+NEG.title; $('negRoom').classList.remove('hide');
+    $('negChat').innerHTML='';
+    addMsg(NEG.context,'opp');
+    renderAsk(); $('negReview').textContent='Complete a deal to see your AI coach\'s breakdown.';
+    // defaults available to grow the deal room without heavy input
+    setTimeout(()=>addMsg('You: I\'d start by asking about revenue and EBITDA. [tap a question below, then make an offer]','sys'),900);
+  }catch(e){toast(e.message);}
+}
+function addMsg(txt,who){const d=document.createElement('div');d.className='msg '+who;d.textContent=txt;$('negChat').appendChild(d);$('negChat').scrollTop=$('negChat').scrollHeight;}
+const QLABEL={revenue:'Revenue',ebitda:'EBITDA',why_selling:'Why selling',concentration:'Customer concentration',contracts:'Contract renewals',market_rent:'Market rents',vacancy:'Vacancy rates'};
+function renderAsk(){
+  const rem=(NEG.opp_ask||[]).filter(q=>!NEG.asked.includes(q));
+  $('negAsk').innerHTML=rem.map(q=>`<button class="sec" onclick="askQ('${q}')">${QLABEL[q]||q}</button>`).join('')||'<span style="color:var(--dim);font-size:12px">You\'ve asked everything.</span>';
+  $('negCounterBtn').classList.add('hide');
+  if(NEG.status==='accepted'||NEG.status==='walked'){ $('negAsk').innerHTML=''; }
+}
+async function askQ(q){
+  try{const r=await api('/players/'+P.id+'/negotiate/ask',{method:'POST',body:JSON.stringify({qid:q})});NEG=await fetch('/api/players/'+P.id).then(r=>r.json()).then(p=>p.negotiation); if(!NEG)return;
+    addMsg('You: '+r.msg,'you');addMsg('Owner: '+r.reply,'opp');renderAsk();
+  }catch(e){toast(e.message);}
+}
+async function makeOffer(){
+  const amt=parseFloat($('negAmount').value);if(!amt)return toast('Enter an offer.');
+  try{
+    const r=await api('/players/'+P.id+'/negotiate/offer',{method:'POST',body:JSON.stringify({amount:amt})});
+    NEG=await fetch('/api/players/'+P.id).then(r=>r.json()).then(p=>p.negotiation);
+    addMsg('You offer: '+money(amt),'you');
+    if(r.type==='counter'&&NEG.status!=='accepted'){addMsg('Owner: '+r.reply+' [tap "Make offer" again or accept the counter]','opp');}
+    else if(NEG.status==='accepted'){addMsg('Owner: '+r.reply,'opp'); $('negCloseBtn').textContent='End deal → review';}
+    else if(NEG.status==='walked'){addMsg('Owner: '+r.reply,'opp');}
+    else {addMsg('Owner: '+r.reply,'opp');}
+    $('negAmount').value='';
+    if(NEG.status==='accepted'){ // show accept-counter path not needed; deal closed
+      $('negAsk').innerHTML=''; 
+    }
+    renderAsk();
+  }catch(e){toast(e.message);}
+}
+async function acceptCounter(){
+  try{const r=await api('/players/'+P.id+'/negotiate/counter',{method:'POST'});NEG=await fetch('/api/players/'+P.id).then(r=>r.json()).then(p=>p.negotiation);addMsg('You accept '+r.reply.replace('You accept ','')+'','you');renderAsk();$('negCloseBtn').textContent='End deal → review';}
+  catch(e){toast(e.message);}
+}
+async function closeNeg(){
+  if(!NEG||!(NEG.status==='accepted'||NEG.status==='walked'))return toast('Reach a deal (or a walkaway) first — then close for review.');
+  try{
+    const r=await api('/players/'+P.id+'/negotiate/close',{method:'POST'});
+    P=r.player; NEG=null;
+    const rev=r.review;
+    $('negReview').innerHTML=
+      `<div class="kpi" style="margin-bottom:10px">
+        <div class="k"><div class="n ${rev.score>=70?'green':'red'}">${rev.score}</div><div class="l">Overall</div></div>
+        <div class="k"><div class="n">${rev.negotiation}</div><div class="l">Negotiation</div></div>
+        <div class="k"><div class="n">${rev.diligence}</div><div class="l">Due diligence</div></div>
+      </div>
+      <p><b>${rev.summary}</b></p>${rev.insights.map(i=>`<p style="margin-top:8px;color:var(--dim);font-size:13px">◾ ${i}</p>`).join('')}
+      <p style="margin-top:10px;color:var(--dim);font-size:13px">Financial: captured <b class="green">${money(r.financial.gain)}</b> equity value; cash now <b class="gold">${money(r.financial.cash_after)}</b>; net worth <b>${money(r.financial.net_worth_after)}</b>.</p>`;
+    hash(); renderSkills();
+    toast(rev.score>=70?'Great deal — your skills are climbing.':'Completed. Review the coach notes and try again, sharper.');
+    $('negCloseBtn').textContent='End deal → review';
+  }catch(e){toast(e.message);}
+}
+function renderSkills(){
+  if(!P)return;
+  $('skillKpi').style.display='flex';
+  $('skillKpi').innerHTML=['negotiation','sales','finance'].map(k=>`<div class="k"><div class="n gold">${P.skills[k]||0}</div><div class="l">${k[0].toUpperCase()+k.slice(1)}</div></div>`).join('');
+}
+function renderPassport(){
+  $('ppHandle').textContent=P.handle;
+  $('ppIndustry').textContent='Industry: '+(P.passport.industry||'New Founder');
+  $('ppRep').textContent='Reputation: '+(P.passport.reputation||'—')+' · Verified: '+(P.passport.verified?'Yes ✓':'No');
+  $('ppSkills').innerHTML=['negotiation','sales','finance'].map(k=>`<div class="k"><div class="n gold">${P.skills[k]||0}</div><div class="l">${k[0].toUpperCase()+k.slice(1)}</div></div>`).join('');
+  $('ppNet').innerHTML=(P.passport.network||[]).map(n=>`<p style="margin:4px 0">• ${n.with} (${n.kind}) — rating ${n.rating}</p>`).join('')||'No connections yet. Close deals to build your network.';
+}
+
+// ---------- Learning Lab + Money
+let LEARN=null;
+(async()=>{try{LEARN=await api('/learning');buildBookList();buildClassList();}catch(e){}})();
+function audible(book){return LEARN.audible_search+encodeURIComponent(book.title+" audiobook");}
+function fmtSk(d){return Object.entries(d||{}).map(([k,v])=>k[0].toUpperCase()+k.slice(1)+' +'+v).join(', ');}
+function buildBookList(){
+  const pl=P||{books:{}}; const mine=pl.books||{};
+  $('bookList').innerHTML=LEARN.books.map(b=>{
+    const cur=mine[b.id]||{minutes:0,done:false};
+    const pct=Math.min(100,Math.round(cur.minutes/(b.hours*60)*100));
+    return `<div class="card"><div style="font-weight:700">${b.title}</div>
+      <div style="color:var(--dim);font-size:12px">${b.author} · ${b.category} · ${b.hours}h</div>
+      <p style="color:var(--dim);font-size:12px;margin:6px 0">Teaches: <b class="cyan">${fmtSk(b.skills)}</b></p>
+      <div style="font-size:12px"><span class="${cur.done?'green':'gold'}">${pct}% complete</span> · <span class="green">finish bonus +$${b.cash}</span></div>
+      <div class="row" style="margin-top:8px">
+        <input id="bk-${b.id}" type="number" placeholder="minutes" style="width:80px">
+        <button class="sec" onclick="logListen('${b.id}')">Log</button>
+        <button class="sec" onclick="readTestPrompt('${b.id}')">Read+test</button>
+        <button class="sec" onclick="readUp('${b.id}')">Upload</button>
+        <a class="sec" target="_blank" rel="noopener" href="${audible(b)}" style="text-decoration:none;line-height:normal;display:inline-block;padding:10px 14px;border-radius:8px">Audible →</a>
+      </div></div>`;
+  }).join('');
+}
+async function logListen(id){
+  const mins=parseFloat(document.querySelector('#bk-'+id).value); if(!LEARN.business&&!P.business){} 
+  if(!mins)return toast('Enter minutes listened.');
+  try{const r=await api('/players/'+P.id+'/books/progress',{method:'POST',body:JSON.stringify({book_id:id,minutes:mins})});
+    const g=r.completed?`<span class="green">Book complete! +$${r.cash}</span>`:`+${r.xp} XP`;
+    P=r.player; toast(`Logged ${mins} min · ${g}`); hash(); renderLearn();
+  }catch(e){toast(e.message);}
+}
+function buildClassList(){
+  const mine=P||{classes:{}}; const done=mine.classes||{};
+  $('classList').innerHTML=LEARN.classes.map(c=>{
+    const d=done[c.id];
+    return `<div class="card"><div style="font-weight:700">${c.title}</div>
+      <div style="color:var(--dim);font-size:12px">${c.category} · ${c.minutes} min</div>
+      <p style="color:var(--dim);font-size:12px;margin:6px 0"><b class="cyan">Skill:</b> ${fmtSk(c.skills)}</p>
+      <p style="color:var(--dim);font-size:12px">${c.exercise}</p>
+      <div style="font-size:12px;margin:6px 0">${d?`<b class="green">✓ Done (${d.score}/100) · +$${c.cash} earned</b>`:`<span class="green">Pass (60+): +$${c.cash}</span>`}</div>
+      ${d?'':'<div class="row" style="margin-top:8px"><input id="cl-'+c.id+'" type="number" placeholder="score 0-100" style="width:90px"><button class="imp" onclick="completeClass(\''+c.id+'\')">Complete</button></div>'} 
+      </div>`;
+  }).join('');
+}
+async function completeClass(id){
+  const sc=parseFloat(document.querySelector('#cl-'+id).value); if(!sc)return toast('Enter your exercise score.');
+  try{const r=await api('/players/'+P.id+'/classes/complete',{method:'POST',body:JSON.stringify({class_id:id,score:sc})});
+    P=r.player; toast(r.passed?`Class passed! +$${r.cash} earned`:`You scored ${sc} — need 60+. Keep practising.`); hash(); renderLearn();
+  }catch(e){toast(e.message);}
+}
+function renderLearn(){ if(!LEARN)return; buildBookList(); buildClassList(); }
+function renderMoney(){
+  if(!P)return;
+  fetch('/api/players/'+P.id+'/wallet').then(r=>r.json()).then(w=>{
+    $('mWallet').textContent='$'+w.wallet.toLocaleString(undefined,{maximumFractionDigits:0});
+    $('mXp').textContent=w.xp.toLocaleString(); $('mLevel').textContent=w.level; $('mDeals').textContent=w.deals;
+    $('attList').innerHTML=w.attestations.length?w.attestations.map((a,i)=>`<p style="margin:3px 0">${a.verified?'<b class="green">✓</b>':'<span class="gold">⏳</span>'} ${esc(a.title)} <span style="color:var(--dim)">${esc(a.url)}</span>${a.verified?` → <b class="green">+$${a.cash}</b> +${a.xp}XP`:''}</p>`).join(''):'No real-world projects verified yet. Build something real, then share it above.';
+    $('payoutLedger').innerHTML=w.payouts.length?'<div style="font-weight:700;color:var(--txt)">Payout ledger</div>'+w.payouts.map(p=>`<p style="margin:3px 0">${p.processor} $${(p.amount_cents/100).toFixed(2)} · <b class="${p.status==='paid'||p.status==='submitted'?'green':'gold'}">${p.status}</b> ${p.error?'· <span style="color:var(--dim)">'+p.error.slice(0,40)+'</span>':''}</p>`).join(''):'No payouts yet. Earn money, then request a cash-out.';
+  });
+  $('payStatus').textContent=LEARN?.payments?
+    `Live processors: Stripe ${LEARN.payments.stripe} · PayPal ${LEARN.payments.paypal}. ${
+      (LEARN.payments.stripe_configured||LEARN.payments.paypal_configured)
+        ?'Real payouts will transfer to your connected account.'
+        :'Payment processor not configured yet — requests are recorded as pending and no money moves until the operator adds Stripe/PayPal keys.'}`:'';
+}
+$('attBtn').onclick=async()=>{
+  const title=$('attTitle').value, url=$('attUrl').value; if(!title||!url)return toast('Enter a title and live URL.');
+  try{const r=await api('/players/'+P.id+'/attest',{method:'POST',body:JSON.stringify({title,url})});
+    $('attTitle').value='';$('attUrl').value='';toast(r.note);renderMoney();}catch(e){toast(e.message);}
+};
+$('payConnectBtn').onclick=async()=>{
+  try{const r=await api('/players/'+P.id+'/payout/connect',{method:'POST',body:JSON.stringify({processor:$('payProcessor').value,account:$('payAcct').value})});
+    toast(r.note||(r.ok?'Connected.':'Error: '+r.error));renderMoney();}catch(e){toast(e.message);}
+};
+$('payReqBtn').onclick=async()=>{
+  const amt=parseFloat($('payAmt').value); if(!amt)return toast('Enter an amount.');
+  try{const r=await api('/players/'+P.id+'/payout/request',{method:'POST',body:JSON.stringify({processor:$('payProcessor').value,amount_cents:Math.round(amt*100),account:$('payAcct').value})});
+    $('payNote').textContent=r.payout.status==='pending'?r.payout.error.slice(0,60):('Status: '+r.payout.status);renderMoney();}catch(e){toast(e.message);}
+};
+
+// ---------- Living World: Work / Market / Coaches / Connect
+let WORLD=null;
+(async()=>{try{WORLD=await api('/world');}catch(e){}})();
+function money0(n){return '$'+Math.round(n).toLocaleString();}
+function renderWork(){
+  if(!P)return;
+  api('/players/'+P.id+'/work').then(w=>{
+    const rels=w.companies||[];
+    $('ncRel').innerHTML=rels.length?rels.map(r=>`<span class="pill">${r.name} — trust ${r.rep} · ${r.done} contract(s)</span>`).join(''):'No relationships yet. Take a contract with an NPC company.';
+    $('workList').innerHTML=(w.available||[]).map(c=>`
+      <div class="card"><div style="font-weight:700">${c.title}</div>
+        <div style="color:var(--dim);font-size:12px">${c.company_name||'NPC'} · ${c.service_label} · difficulty ${c.difficulty}/5</div>
+        <p style="color:var(--dim);font-size:12px;margin:6px 0">Skills: ${c.skills_used.join(', ')}</p>
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <span class="cost">${money0(c.budget)}</span>
+          <button class="sec" onclick="takeWork('${c.id}')">Take contract</button>
+        </div></div>`).join('')||'All contracts taken. Deliver them or check your relationships.';
+  }).catch(e=>$('workList').textContent='Error: '+e.message);
+}
+async function takeWork(id){
+  try{const r=await api('/players/'+P.id+'/work/take',{method:'POST',body:JSON.stringify({contract_id:id})});
+    // offer immediate delivery (skills-based)
+    const d=await api('/players/'+P.id+'/work/complete',{method:'POST',body:JSON.stringify({contract_id:id})});
+    P=d.player; toast(`${d.success?'Delivered ✓ +$'+d.pay:'Partial — cost price'}. ${r.contract.company_name||''}`); renderWork(); hash();
+  }catch(e){toast(e.message);}
+}
+function renderMarket(){
+  if(!P)return;
+  api('/players/'+P.id+'/market').then(m=>{
+    $('ownedList').innerHTML=Object.keys(m.owned||{}).length?
+      Object.entries(m.owned).map(([id,o])=>`<p style="margin:4px 0">✓ <b>${o.name}</b> — bought ${money0(o.price)} · equity held</p>`).join('')
+      :'Nothing owned yet. Buy the rights to a business below.';
+    $('marketList').innerHTML=(WORLD.listings||[]).map(b=>`
+      <div class="card"><div style="font-weight:700">${b.name} <span style="color:var(--dim);font-size:11px">${b.kind==='real'?'REAL':'VIRTUAL'}</span></div>
+        <div style="color:var(--dim);font-size:12px">${b.sector} · revenue ${money0(b.revenue)} · ${Math.round(b.margin*100)}% margin</div>
+        <p style="color:var(--dim);font-size:12px;margin:6px 0">${b.note}</p>
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <span class="cost">${money0(b.price)}</span>
+          ${m.owned&&m.owned[b.id]?'<b class="green">Owned</b>':`<button class="sec" onclick="buyBiz('${b.id}')">Buy rights</button>`}
+        </div></div>`).join('');
+  }).catch(e=>$('marketList').textContent='Error: '+e.message);
+}
+async function buyBiz(id){
+  try{const r=await api('/players/'+P.id+'/market/buy',{method:'POST',body:JSON.stringify({listing_id:id})});
+    P=r.player; toast(`Acquired ${r.bought} for ${money0(r.price)}!`); renderMarket(); hash(); renderMoney();
+  }catch(e){toast(e.message);}
+}
+function renderCoaches(){
+  if(!P)return;
+  api('/players/'+P.id+'/coaches').then(cb=>{
+    $('myBookings').innerHTML=(cb.bookings||[]).length?cb.bookings.map(b=>`<p style="margin:4px 0">• <b>${b.coach}</b> (${b.specialty}) · ${money0(b.rate)} · ${b.status}</p>`).join(''):'No coaching sessions booked yet.';
+    $('coachList').innerHTML=(WORLD.coaches||[]).map(c=>`
+      <div class="card"><div style="font-weight:700">${c.name}</div>
+        <div style="color:var(--dim);font-size:12px">${c.title} · ${c.specialty}</div>
+        <p style="color:var(--dim);font-size:12px;margin:6px 0">${c.bio}</p>
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <span class="cost">${money0(c.rate)}/hr</span>
+          <button class="sec" onclick="bookCoach('${c.id}')">Book a real session</button>
+        </div></div>`).join('');
+  }).catch(e=>$('coachList').textContent='Error: '+e.message);
+}
+async function bookCoach(id){
+  try{const r=await api('/players/'+P.id+'/coaches/book',{method:'POST',body:JSON.stringify({coach_id:id})});
+    P=r.player; toast(`Booked ${r.booking.coach}. ${r.note}`); renderCoaches(); renderMoney();
+  }catch(e){toast(e.message);}
+}
+function renderConnect(){
+  if(!P)return;
+  api('/players/'+P.id+'/integrations').then(it=>{
+    $('meetingsList').innerHTML=(it.meetings||[]).length?it.meetings.map(m=>`<p style="margin:4px 0">✓ <b>${m.title}</b> (${m.platform}, ${m.participants}p) — folded into your mentor's knowledge</p>`).join(''):'No real meetings logged yet. Meet someone real, then log it here.';
+    $('mentorNote').textContent=(WORLD?.llm? 'Live LLM mentor is active — it remembers your real meetings.' : 'Mentor is coaching deterministically. Add an LLM key for the live mentor.')+' Everything here is typed. Voice & voice-to-text arrive in a future release.';
+  });
+}
+$('mentorBtn').onclick=async()=>{
+  const q=$('mentorQ').value; if(!q)return;
+  try{const r=await api('/players/'+P.id+'/mentor',{method:'POST',body:JSON.stringify({question:q})});
+    $('mentorOut').innerHTML=`<b>EMP:</b> ${r.reply}<div style="margin-top:6px;color:var(--dim);font-size:12px">${r.notes} · +${r.you_got_xp} XP</div>`;
+    $('mentorQ').value=''; if(r.kind==='llm'){P.xp=(P.xp||0)+r.you_got_xp;hash();}
+  }catch(e){toast(e.message);}
+};
+$('meetSaveBtn').onclick=async()=>{
+  try{const r=await api('/players/'+P.id+'/integrations/connect',{method:'POST',body:JSON.stringify({platform:$('meetPlatform').value,value:$('meetLink').value})});
+    toast(r.note);}catch(e){toast(e.message);}
+};
+$('meetLogBtn').onclick=async()=>{
+  const title=$('mtTitle').value; if(!title)return toast('Enter who you met.');
+  const pp=parseInt($('mtPeople').value||'1');
+  try{const r=await api('/players/'+P.id+'/integrations/log-meeting',{method:'POST',body:JSON.stringify({title,platform:$('meetPlatform').value,participants:pp})});
+    P=r.player; toast(`+${r.xp_gained} XP for a real connection!`); renderConnect(); hash();}catch(e){toast(e.message);}
+};
+
+// ---------- Nation / Network / Reading
+$('startSearchBtn').onclick=()=>nationStartSearch();
+$('startSearch').addEventListener('keydown',e=>{if(e.key==='Enter')nationStartSearch();});
+async function nationStartSearch(){
+  const q=$('startSearch').value.trim(); if(!q)return;
+  try{
+    const r=await fetch('/api/nation/search?q='+encodeURIComponent(q)).then(x=>x.json());
+    $('startResults').innerHTML=(r.results||[]).length?r.results.map((c,i)=>`<button class="sec" style="margin:3px" onclick="pickNation('${c.name}, ${c.state}')">${c.name}, ${c.state} (biz ${c.biz})</button>`).join(''):'<span style="color:var(--dim)">No US city found — try another.</span>';
+  }catch(e){toast(e.message);}
+}
+let _picked=null;
+function pickNation(v){
+  _picked=v;
+  $('startResults').innerHTML=`
+    <div style="border:1px solid var(--gold);border-radius:10px;padding:10px" class="row" style="justify-content:center">
+      <b class="gold">${v}</b>
+      <input id="hand2" placeholder="Your founder handle" style="width:180px">
+      <button class="imp" onclick="startInNation()">Start here →</button>
+    </div>`;
+}
+async function startInNation(){
+  const handle=$('hand2').value.trim()||'founder-'+Math.floor(Math.random()*999);
+  const user=($('authUser').value||handle).trim().toLowerCase();
+  const pw=$('authPw').value||'';
+  try{
+    const p=await api('/players',{method:'POST',body:JSON.stringify({handle,username:user,password:pw,city:_picked})});
+    if(p.token)saveToken(p.token);
+    window.META=window.META||await api('/meta');
+    await enterGame(p);
+    $('cityInfo').textContent=`You start in ${p.city}, ${p.state.toUpperCase()} — a real US city (COL ${p.col}, opportunity ${p.biz}/100).`;
+  }catch(e){toast(e.message);}
+}
+// Nation explore
+$('nSearchBtn').onclick=nationExplore;
+$('nSearch').addEventListener('keydown',e=>{if(e.key==='Enter')nationExplore();});
+async function nationExplore(){
+  const q=$('nSearch').value.trim(); if(!q)return;
+  try{
+    const sr=await fetch('/api/nation/search?q='+encodeURIComponent(q)).then(x=>x.json());
+    if(!sr.results.length)return toast('Not found.');
+    const c=sr.results[0];
+    const d=await fetch(`/api/nation/city?name=${encodeURIComponent(c.name)}&state=${c.state}`).then(x=>x.json());
+    $('cityBooth').innerHTML=`
+      <h3>${d.city}, ${d.state.toUpperCase()}</h3>
+      <p style="color:var(--dim)">Business opportunity <b class="gold">${d.biz}</b>/100 · cost-of-living ${d.col} · market with ${d.local_businesses.length} local businesses &amp; ${d.corporations.length} national corps.</p>
+      <div style="margin-top:8px"><b style="color:var(--cyan)">Local businesses:</b> ${d.local_businesses.map(b=>b.name).join(' · ')}</div>
+      <div style="margin-top:6px"><b style="color:var(--cyan)">Corporations:</b> ${d.corporations.map(c=>(`${c.name} (${c.sector})`)).join(' · ')}</div>`;
+    $('charList').innerHTML=d.characters.map(ch=>`
+      <div class="card"><div style="font-weight:700">${ch.name} <span style="color:var(--dim);font-size:11px">${ch.role}</span></div>
+        <div style="color:var(--dim);font-size:12px">${ch.company} · ${ch.personality}</div>
+        <input id="chq-${ch.id}" placeholder="Ask a business question…" style="width:100%;margin-top:6px">
+        <div class="row" style="justify-content:space-between;margin-top:6px">
+          <button class="sec" onclick="askChar('${ch.id}')">Talk</button>
+          <span class="pill" style="opacity:.55" title="Voice & voice-to-text are future development">voice: soon</span>
+        </div>
+        <div id="chout-${ch.id}" style="font-size:12px;color:var(--dim);margin-top:4px"></div></div>`).join('')
+      ||'<span style="color:var(--dim)">No characters.</span>';
+  }catch(e){toast(e.message);$('cityBooth').innerHTML='<span style="color:var(--red)">'+e.message+'</span>';}
+}
+async function askChar(id){
+  const q=document.querySelector('#chq-'+id).value||'What do you need from a partner?';
+  const out=document.querySelector('#chout-'+id);
+  out.textContent='…';
+  try{const r=await api('/players/'+P.id+'/characters/ask',{method:'POST',body:JSON.stringify({character_id:id,question:q})});
+    out.innerHTML=`<b>${r.character}:</b> ${r.reply} <span style="color:var(--dim)">(${r.kind}) · +${r.you_got_xp} XP</span>`;
+    if(r.kind==='llm'){P.xp=(P.xp||0)+r.you_got_xp;hash();}
+  }catch(e){out.textContent=e.message;}
+}
+async function speakChar(id){
+  const q=document.querySelector('#chq-'+id).value||"Let's talk business.";
+  try{const r=await api('/players/'+P.id+'/characters/speak',{method:'POST',body:JSON.stringify({character_id:id,text:q})});
+    const out=document.querySelector('#chout-'+id);
+    out.innerHTML=r.ok?`<audio controls src="${r.audio}"></audio>`:`${r.character}: "${r.fallback_text}" <span style="color:var(--red)">${r.error}</span>`;
+  }catch(e){toast(e.message);}
+}
+$('liBtn').onclick=async()=>{
+  try{const r=await api('/players/'+P.id+'/linkedin',{method:'POST',body:JSON.stringify({url:$('liUrl').value})});
+    P=r.player; toast(`LinkedIn linked · +${r.xp_gained} XP`); hash();}catch(e){toast(e.message);}
+};
+function renderNation(){ if(!P)return; }
+// Network
+async function renderNetwork(){
+  if(!P)return;
+  const s=await api('/players/'+P.id+'/network/matches'); if(s.band===undefined)return;
+  $('netSelf').textContent=`You: ${P.handle} · ${P.city}, ${P.state.toUpperCase()} · ${s.my_xp} XP · Level ${P.level}`;
+  $('matchList').innerHTML=s.band.length?s.band.map(p=>`<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0"><span><b>${esc(p.handle)}</b> · ${p.city}, ${p.state} · ${p.xp} XP · L${p.level}</span><button class="sec" onclick="msgTo('${p.id}','${esc(p.handle)}')">Message</button></div>`).join(''):'No players near your XP yet. Keep earning XP to find peers.';
+  $('msgWho').innerHTML=s.band.length?s.band.map(p=>`<option value="${p.id}">${esc(p.handle)} (${p.xp} XP)</option>`).join(''):'<option>—</option>';
+}
+window.msgTo=function(id,handle){$('msgWho').value=id;$('msgText').value='';$('msgText').focus();};
+$('msgBtn').onclick=async()=>{
+  const to=$('msgWho').value, msg=$('msgText').value; if(!msg)return toast('Write a message.');
+  try{const r=await api('/players/'+P.id+'/message',{method:'POST',body:JSON.stringify({to,msg})});
+    toast('Message sent.'); $('msgText').value='';}catch(e){toast(e.message);}
+};
+async function refreshInbox(){ if(!P)return;
+  try{const r=await api('/players/'+P.id+'/inbox');
+    $('inboxList').innerHTML=r.messages.length?r.messages.map(m=>`<p style="margin:5px 0"><b>${esc(m.from_handle)}:</b> ${esc(m.msg)}</p>`).join(''):'No messages yet.';}catch(e){}
+}
+// ping inbox a couple times while on the tab
+async function networkLoop(){ if(!P)return; for(let i=0;i<20;i++){ setTimeout(refreshInbox,i*3000);} }
+setInterval(()=>{ if(!document.querySelector('#view-network').classList.contains('hide')&&P)refreshInbox(); },6000);
+
+async function readTestPrompt(id){
+  const sc=window.prompt('You read the book — score your comprehension test /10 (as honest points):');
+  if(sc===null)return; const score=parseFloat(sc||'0')*10;
+  try{const r=await api('/players/'+P.id+'/reading/test',{method:'POST',body:JSON.stringify({book_id:id,score})});
+    P=r.player;
+    toast(r.passed?`Book certified! +$${r.cash} earned, +${r.xp_gained} XP`:`Scored ${r.score}/100 — need 70+. Soak it in and retake.`); hash(); renderLearn();
+  }catch(e){toast(e.message);}
+}
+async function readUp(id){
+  const url=window.prompt('Paste the audiobook/recording link you listened to:'); if(!url)return;
+  try{const r=await api('/players/'+P.id+'/reading/upload',{method:'POST',body:JSON.stringify({book_id:id,url})});
+    toast(r.note);}catch(e){toast(e.message);}
+}
+
+// ---------- Real World Missions + lifelong coach greeting
+let MISSIONS=null;
+(async()=>{try{const r=await api('/missions');MISSIONS=r.missions;}catch(e){}})();
+function renderMissions(){
+  if(!P)return;
+  if(!MISSIONS)$('missionBoard').innerHTML='Loading…';
+  else $('missionBoard').innerHTML=MISSIONS.map((m,i)=>`
+    <div class="card"><div style="font-weight:700">${m.title} <span class="pill">${m.skill}</span></div>
+      <p style="color:var(--dim);font-size:12px;margin:6px 0">${m.task}</p>
+      <div style="font-size:12px" class="row"><span class="green">Verify: +${m.verified_cash} money · +${m.verified_xp} XP</span> <span class="cyan">Submit: +${m.submit_xp} XP</span></div>
+      <div class="row" style="margin-top:8px">
+        <input id="mse-${i}" placeholder="Evidence / notes (no sensitive info)" style="flex:1">
+        <input id="msu-${i}" placeholder="optional link" style="width:130px">
+        <button class="imp" onclick="submitMission(${i})">Submit</button>
+      </div></div>`).join('');
+  loadMissionLog();
+}
+async function submitMission(i){
+  const mid=MISSIONS[i].id, ev=document.querySelector('#mse-'+i).value||'', url=document.querySelector('#msu-'+i).value||'';
+  try{const r=await api('/players/'+P.id+'/missions/submit',{method:'POST',body:JSON.stringify({mission_id:mid,evidence:ev,url})});
+    P=r.player; toast(`Submitted. +${r.submit_xp} XP now. Verifier confirms for the full reward.`); hash(); loadMissionLog();
+  }catch(e){toast(e.message);}
+}
+async function loadMissionLog(){
+  if(!P)return;
+  try{const w=await fetch('/api/players/'+P.id+'/wallet').then(x=>x.json()); /* missions live on player */ 
+  const p=await api('/players/'+P.id);
+  const ms=p.missions||[];
+  $('missionLog').innerHTML=ms.length?ms.map((m,i)=>`<p style="margin:4px 0"><b>${esc(m.title)}</b> <span class="${m.verified?'green':'gold'}">${m.verified?'✓ verified':'⏳ pending'}</span> ${m.verified?'':' <span style="color:var(--dim);font-size:12px">awaiting operator review</span>'}</p>`).join(''):'No missions yet. Go do something real — then log it.';
+  }catch(e){$('missionLog').textContent=e.message;}
+}
+async function verifyMission(i){ // demo/operator gate — in production this is a human review workflow
+  try{const r=await api('/players/'+P.id+'/missions/verify',{method:'POST',body:JSON.stringify({idx:i})});
+    P=r.player; toast(`Verified! +$${r.cash} money, +${r.xp_gained} XP`); hash(); loadMissionLog(); renderMoney();
+  }catch(e){toast(e.message);}
+}
+async function loadCoach(){
+  if(!P)return;
+  try{const c=await api('/players/'+P.id+'/coach');
+    $('coachQuick').innerHTML=`<p style="color:var(--dim);font-size:13px">${c.note}</p>
+      <p style="margin-top:8px"><b class="gold">${c.card.narrative}</b></p>
+      <p style="margin-top:6px;color:var(--dim)">${c.card.context}</p>
+      <p style="margin-top:6px"><b class="cyan">Coach's next move:</b> ${c.focus.advice}</p>`;
+  }catch(e){}
+}
+
+// ---------- Connected economy
+async function renderEconomy(){
+  if(!P)return;
+  try{
+    const d=await api('/players/'+P.id+'/economy');
+    const prices=d.snapshot.prices||[];
+    $('econPrices').innerHTML=`<div class="kpi">`+prices.map(p=>`<div class="k"><div class="n ${p.trend==='up'?'red':p.trend==='down'?'green':'gold'}">${p.index.toFixed(2)}</div><div class="l">${p.name}<br><span style="color:var(--dim)">$${p.price}</span></div></div>`).join('')+`</div>
+      <p style="font-size:12px;color:var(--dim);margin-top:8px">Commodity price indices (index <b>1.00</b> = baseline). Prices are <b>deterministic</b> market cycles — AI doesn't invent them. When inputs spike, downstream margins compress.</p>`;
+    const chain=d.snapshot.chain||[];
+    $('econChain').innerHTML=chain.filter(i=>i.kind==='produce').map(i=>`<div style="margin:4px 0"><b class="cyan">${i.name}</b> (${i.inputs.join(', ')}) → <b>${i.output||'services'}</b></div>`).join('')
+      +'<div style="margin-top:6px;color:var(--dim)">Consumers (${d.econ?1:0} industry types): '+chain.filter(i=>i.kind==='consume').map(i=>i.name).slice(0,8).join(', ')+'</div>';
+    const ex=d.exposure;
+    if(ex){
+      $('econExposure').innerHTML=`
+        <div style="margin-bottom:8px"><b>${ex.industry}</b> — input-cost pressure <b class="${ex.pressure>1.05?'red':ex.pressure<0.95?'green':'gold'}">×${ex.pressure}</b></div>
+        <div class="kpi">`+ex.basket.items.map(it=>`<div class="k"><div class="n gold">$${it.cost}</div><div class="l">${it.name}</div></div>`).join('')+`</div>
+        <p style="font-size:12px;color:var(--dim);margin-top:6px">Estimated materials bill: <b class="gold">$${ex.materials_bill_est}</b>/mo. Lock a supply contract to cut ~7%.</p>`;
+    }else{ $('econExposure').innerHTML='Start a business to see your input exposure.'; }
+    // supplier offers + contracts
+    const have=(d.contracts||[]).map(c=>c.commodity);
+    $('econOffers').innerHTML=(d.offers||[]).map(o=>`
+      <div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0">
+        <span><b>${o.name}</b> · ${o.supplier}<br><span style="color:var(--dim);font-size:12px">market $${o.market} → offer $${o.offer}/unit for ${o.qty} units</span></span>
+        ${have.includes(o.commodity)?'<b class="green">Locked ✓</b>':`<button class="sec" onclick="lockSupply('${o.commodity}')">Lock ${o.name}</button>`}
+      </div>`).join('')||'No supplier offers for your current business yet.';
+      const sup=await api('/econ/supply');
+      $('econSupply').innerHTML=sup.market.map(cd=>{
+        const po=(cd.offers||[]).filter(o=>o.owner!==P.id);
+        const mo=(cd.offers||[]).filter(o=>o.owner===P.id);
+        if(!po.length && !mo.length) return `<div style="margin:6px 0"><b class="cyan">${cd.name}</b> — no player offers yet<span style="color:var(--dim)"> (demand ${cd.base_demand}/mo)</span></div>`;
+        let o=po.map(o=>`<span style="margin-right:8px"><b>${esc(o.owner)}</b> ${o.units}u @ $${o.price} <button class="sec" style="padding:2px 8px" onclick="buySupply(${o.offer_id},${o.units})">Buy</button></span>`).join('');
+        if(mo.length) o+='<span style="color:var(--green)"> · you offer '+mo.map(m=>m.units+'u @ $'+m.price).join(', ')+'</span>';
+        return `<div style="margin:6px 0"><b class="cyan">${cd.name}</b> ${o||''}</div>`;
+      }).join('') || '';
+    } catch(e){ $('econPrices').textContent='err '+e.message; }
+}
+async function buySupply(oid, avail){
+  const units=parseInt(window.prompt(`Buy how many units? (up to ${avail})`)||'1');
+  if(!units||units<1)return;
+  try{const r=await api('/players/'+P.id+'/supply/buy',{method:'POST',body:JSON.stringify({offer_id:oid,units})});
+    P=r.player; toast(`Bought ${r.units}u for $${r.cost} from a real player — input locked.`); renderEconomy(); renderMoney();
+  }catch(e){toast(e.message);}
+}
+async function lockSupply(cid){
+  try{const r=await api('/players/'+P.id+'/economy/contract',{method:'POST',body:JSON.stringify({commodity:cid})});
+    toast(`${r.locked} locked at $${r.price}. ${r.note}`); renderEconomy();}catch(e){toast(e.message);}
+}
+
+// ---------- Live events + discovery
+async function renderEvents(){
+  if(!P)return;
+  try{
+    const ev=await api('/events');
+    $('eventList').innerHTML=ev.events.map(e=>`
+      <div class="card"><div style="font-weight:700">${e.title} <span class="pill">${e.type}</span></div>
+        <p style="color:var(--dim);font-size:12px;margin:6px 0">${e.blurb}</p>
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <span style="font-size:12px"><b class="cyan">${e.skill}</b> skill · rewards up to +${e.base_xp} XP / +$${e.base_cash} · ${e.cadence}</span>
+          <button class="imp" onclick="enterEvent('${e.id}')">Compete</button>
+        </div></div>`).join('');
+    const h=await api('/players/'+P.id+'/events/history');
+    $('eventHistory').innerHTML=h.entered.length?('Entered: '+h.entered.map(x=>x).join(', ')):'No events entered yet this cycle.';
+  }catch(e){$('eventList').textContent='err '+e.message;}
+}
+async function enterEvent(id){
+  try{const r=await api('/players/'+P.id+'/events/enter',{method:'POST',body:JSON.stringify({event_id:id})});
+    P=r.player; toast(`${r.placed} — +${r.xp} XP, +$${r.cash}`); renderEvents(); hash();}catch(e){toast(e.message);}
+}
+$('discBtn').onclick=doDiscover;
+$('discQ').addEventListener('keydown',e=>{if(e.key==='Enter')doDiscover();});
+async function doDiscover(){
+  try{const q=$('discQ').value.trim(), city=$('discCity').value.trim();
+    const r=await fetch('/api/network/discover?q='+encodeURIComponent(q)+'&city='+encodeURIComponent(city)).then(x=>x.json());
+    $('discList').innerHTML=(r.results||[]).map(u=>`<p style="margin:6px 0"><b>${esc(u.handle)}</b> · ${u.city}, ${u.state} · L${u.level} · ${u.xp} XP ${u.industry?'· '+u.industry:''}<br><span style="color:var(--dim);font-size:12px">${(u.interests||[]).map(esc).join(', ')||'—'}</span></p>`).join('')||'No matches.';
+  }catch(e){$('discList').textContent='err '+e.message;}
+}
+
+// ---------- Stylized isometric Business District (offline, no deps)
+let district={initialized:false, av:{x:0,y:0}, hotspots:[], raf:null, active:null, keys:{}};
+function _iso(x,y){ return {sx: DIST_CX + (x-y)*DIST_T, sy: DIST_CY + (x+y)*DIST_T*0.5}; }
+const DIST_T=34, DIST_CX=470, DIST_CY=40;
+function buildDistrict(){
+  const h=[];
+  h.push({id:'hq',name:'Your HQ',x:3,y:3,color:'#f0c75e',tab:'biz',
+           desc:P.business?P.business_label+' headquarters — run your operation.':'Your business HQ — start one to plant your flag.'});
+  h.push({id:'market',name:'Marketplace',x:5,y:3,color:'#3ddc84',tab:'market',desc:'Buy business rights and trade with the city.'});
+  h.push({id:'deals',name:'Deal Room',x:7,y:3,color:'#5ec8ff',tab:'neg',desc:'Boardroom — negotiate acquisitions and contracts.'});
+  h.push({id:'lounge',name:'Business Lounge',x:3,y:5,color:'#9b6bff',tab:'network',desc:'Meet and message partners near your level.'});
+  h.push({id:'corp',name:'Corporate Park',x:5,y:5,color:'#ff5d5d',tab:'nation',desc:'Explore the city & its real corporations.'});
+  h.push({id:'learning',name:'Learning Hall',x:7,y:5,color:'#ffd97a',tab:'learn',desc:'Sharpen your skills — books, classes, read-tests.'});
+  h.push({id:'bank',name:'Bank & Wallet',x:3,y:7,color:'#4ecdc4',tab:'money',desc:'Your earned wallet, payouts and connections.'});
+  return h;
+}
+function drawDistrict(){
+  const cv=document.getElementById('districtCanvas'); if(!cv||!cv.getContext)return;
+  const ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
+  // ground tiles
+  for(let i=0;i<9;i++)for(let j=0;j<9;j++){
+    const p=_iso(i,j); const ax=(i-j)*DIST_T, ay=(i+j)*DIST_T*0.5;
+    ctx.beginPath(); ctx.moveTo(DIST_CX+ax,DIST_CY+ay); ctx.lineTo(DIST_CX+ax+DIST_T,DIST_CY+ay+DIST_T*0.5);
+    ctx.lineTo(DIST_CX+ax,DIST_CY+ay+DIST_T); ctx.lineTo(DIST_CX+ax-DIST_T,DIST_CY+ay+DIST_T*0.5); ctx.closePath();
+    const isStreet=(i%2===0||j%2===0); ctx.fillStyle=isStreet?'#1a2436':'#131b29';
+    ctx.fill(); ctx.strokeStyle='#223047'; ctx.lineWidth=0.5; ctx.stroke();
+  }
+  // buildings (iso blocks)
+  district.hotspots.forEach(h=>{
+    const p=_iso(h.x,h.y); const bx=p.sx, by=p.sy;
+    ctx.save();
+    // side + top faces for a 3D block look
+    ctx.fillStyle=h.color+'55'; ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(bx+DIST_T,by+DIST_T*0.5); ctx.lineTo(bx+DIST_T,by-16+DIST_T*0.5); ctx.lineTo(bx,by-16); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=h.color+'44'; ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(bx,by-16); ctx.lineTo(bx-DIST_T,by-16+DIST_T*0.5); ctx.lineTo(bx-DIST_T,by+DIST_T*0.5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=h.color; ctx.fillRect(bx-12,by-20,24,10);
+    ctx.fillStyle='#0c'==='#0c'?'#0d1320':''; ctx.fillRect(bx-10,by-18,20,6);
+    ctx.textAlign='center'; ctx.font='700 11px Segoe UI'; ctx.fillStyle='#e8edf5';
+    ctx.fillText(h.name, bx, by+24);
+    ctx.restore();
+  });
+  // avatar
+  const a=_iso(district.av.x+0.5,district.av.y+0.5);
+  ctx.beginPath(); ctx.arc(a.sx,a.sy,7,0,6.283); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(a.sx,a.sy,4,0,6.283); ctx.fillStyle='#5ec8ff'; ctx.fill();
+}
+function nearDist(aX,aY){ let best=null,bd=4;
+  district.hotspots.forEach(h=>{ const d=Math.abs(aX-h.x)+Math.abs(aY-h.y); if(d<bd){bd=d;best=h;} }); return best; }
+function stepAvatar(){
+  const k=district.keys; let dx=0,dy=0;
+  if(k['ArrowUp']||k['w']||k['W'])dy=-1; if(k['ArrowDown']||k['s']||k['S'])dy=1;
+  if(k['ArrowLeft']||k['a']||k['A'])dx=-1; if(k['ArrowRight']||k['d']||k['D'])dx=1;
+  if(!dx&&!dy)return;
+  const nx=Math.max(0.5,Math.min(7.5,district.av.x+dx*0.5));
+  const ny=Math.max(0.5,Math.min(7.5,district.av.y+dy*0.5));
+  district.av={x:nx,y:ny};
+}
+function enterDist(b){ if(!b)return; district.active=b;
+  if(b.tab==='nation'){ fetch(`/api/nation/city?name=${encodeURIComponent(P.city)}&state=${P.state}`).then(r=>r.json()).then(d=>{district._corps=(d.corporations||[]).map(c=>c.name).slice(0,4).join(', ')||'the city corporate players'; renderDistPanel(b);}).catch(()=>{district._corps='city corporate players';renderDistPanel(b);}); }
+  else renderDistPanel(b);
+}
+function renderDistPanel(b){
+  let extra='';
+  if(b.id==='corp') extra='<p style="color:var(--dim);font-size:12px">Inside: '+ (district._corps||'loading…') +'</p>';
+  if(b.id==='hq'){ }
+  $('districtPanel').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div><b style="color:${b.color}">${b.icon||'▣'} ${b.name}</b><div style="margin-top:4px;font-size:14px">${b.desc}</div>${extra}</div>
+      <button class="imp" onclick="goDist('${b.tab}')">Enter → ${b.tab}</button>
+    </div>`;
+}
+window.goDist=function(tab){ navigate(tab); };
+function initDistrict(){
+  if(!P)return;
+  $('districtCity').textContent=`${P.city}, ${P.state.toUpperCase()}`;
+  if(!district.initialized){
+    district.hotspots=buildDistrict(); district.initialized=true;
+    const cv=document.getElementById('districtCanvas');
+    cv.addEventListener('click',e=>{
+      const rect=cv.getBoundingClientRect(); const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      // find nearest hotspot on screen
+      let best=null,bd=40;
+      district.hotspots.forEach(h=>{ const p=_iso(h.x,h.y); const d=Math.hypot(mx-p.sx,my-p.sy); if(d<bd){bd=d;best=h;} });
+      if(best)enterDist(best); });
+    window.addEventListener('keydown',e=>{district.keys[e.key]=true;});
+    window.addEventListener('keyup',e=>{district.keys[e.key]=false;});
+  }
+  district.av={x:1,y:7}; district.active=null;
+  $('districtPanel').innerHTML='<p style="color:var(--dim)">Standing at the edge of the district. Click a building or walk in (WASD / arrows).</p>';
+  if(district.raf) cancelAnimationFrame(district.raf);
+  const loop=()=>{ stepAvatar(); const near=nearDist(district.av.x,district.av.y); drawDistrict(); district.raf=requestAnimationFrame(loop); };
+  loop();
+}
+
+// ---------- accounts & auth
+function saveToken(t){TOKEN=t||''; if(t)localStorage.setItem('fc_token',t); else localStorage.removeItem('fc_token');}
+async function enterGame(p){
+  P=p; $('gHandle').textContent=p.handle; $('gCity').textContent=p.city;
+  window.META=window.META||await api('/meta');
+  $('startScreen').classList.add('hide'); $('startScreen2') && $('startScreen2').classList.add('hide');
+  $('gameScreen').classList.remove('hide'); hash(); renderBiz(); renderMove(); renderSkills();
+  buildBizList(); loadDashboard();
+}
+async function tryAutoLogin(){
+  if(!TOKEN)return;
+  try{const r=await api('/auth/me'); if(r.player) await enterGame(r.player); else saveToken('');}
+  catch(e){ saveToken(''); }
+}
+$('startBtn').onclick=async()=>{
+  const user=($('authUser').value||'').trim().toLowerCase();
+  const pw=$('authPw').value||'';
+  let handle=$('handle').value.trim()||user||window._auto?.handle||('founder-'+Math.floor(Math.random()*999));
+  let city=window._auto?.city;
+  if(!city){const v=$('citySel').value;city=v.split(',')[0].trim();}
+  const mode=$('authMode').value;
+  try{
+    if(mode==='login'){
+      const r=await api('/auth/login',{method:'POST',body:JSON.stringify({username:user,password:pw})});
+      saveToken(r.token);
+      if(r.player){ await enterGame(r.player); return; }
+      // account exists but no player yet -> create one bound to it
+      const body={handle,city}; if(window._here&&window._auto){body.lat=window._auto.lat+0.001;body.lon=window._auto.lon+0.001;}
+      const np=await api('/players',{method:'POST',body:JSON.stringify({...body,username:user,password:pw})});
+      // binding already happened server-side; np returned a token
+      if(np.token)saveToken(np.token);
+      await enterGame(np);
+    }else{
+      const body={handle,username:user,password:pw,city}; if(window._here&&window._auto){body.lat=window._auto.lat+0.001;body.lon=window._auto.lon+0.001;}
+      const p=await api('/players',{method:'POST',body:JSON.stringify(body)});
+      if(p.token)saveToken(p.token);
+      $('gHandle').textContent=p.handle;
+      window.META=window.META||await api('/meta');
+      $('startScreen').classList.add('hide'); $('gameScreen').classList.remove('hide');
+      P=p;
+      const c=(window.META.cities||[]).find(c=>c.name===p.city);
+      $('cityInfo').textContent=`You start in ${p.city}, ${p.state&&p.state.toUpperCase()} — a living market (COL ${c?c.col:''} , opportunity ${c?c.biz:''}/100).`;
+      hash(); renderMoney(); loadCoach(); renderBiz(); renderMove(); renderSkills(); buildBizList();
+    }
+  }catch(e){toast(e.message||'Login/creating account failed');}
+};
+window.logout=async function(){ try{await api('/auth/logout',{method:'POST'});}catch(e){} saveToken(''); location.reload(); };
+init().then(tryAutoLogin);
+</script>
+</body>
+</html>

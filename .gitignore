@@ -1,0 +1,6 @@
+.env
+empire.db
+empire.db-wal
+empire.db-shm
+__pycache__/
+static/voice_*.mp3
